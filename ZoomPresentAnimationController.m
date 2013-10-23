@@ -3,7 +3,7 @@
 //  LAFitness
 //
 //  Created by Gina Mullins on 10/15/13.
-//  Copyright (c) 2013 Fitness International LLC. All rights reserved.
+//  Copyright (c) 2013 xxxxxxxxxx LLC. All rights reserved.
 //
 
 #import "ZoomPresentAnimationController.h"
