@@ -12,6 +12,8 @@
 #import "ZoomPresentAnimationController.h"
 #import "ShrinkDismissAnimationController.h"
 
+#define kMAX_IMAGE          25
+
 
 NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
 
@@ -19,6 +21,7 @@ NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
 
 @property (nonatomic, strong) GalleryDetailViewController *detailView;
 @property (nonatomic, strong) NSMutableArray *thumbPhotos;
+@property (nonatomic, assign) CGPoint touchPoint;
 
 @end
 
@@ -35,7 +38,7 @@ NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self)
     {
-        self.thumbPhotos = [[NSMutableArray alloc] initWithCapacity:13];
+        self.thumbPhotos = [[NSMutableArray alloc] initWithCapacity:kMAX_IMAGE];
         _zoomAnimationController = [ZoomPresentAnimationController new];
         _shrinkAnimationController = [ShrinkDismissAnimationController new];
     }
@@ -54,7 +57,7 @@ NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
     self.navigationController.delegate = self;
     
 	//set up photos array
-    for (int i = 1; i <= 13; i++)
+    for (int i = 1; i <= kMAX_IMAGE; i++)
     {
         NSString *thmImageName = [NSString stringWithFormat:@"thmImage%d.jpg", i];
         [self.thumbPhotos addObject:thmImageName];
@@ -95,6 +98,16 @@ NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
     // let the zoomController know which cell was selected
     _zoomAnimationController.cellSelected = indexPath.row;
     
+    // also send relative coords for selected cell
+    if ([self.collectionView.indexPathsForVisibleItems containsObject:indexPath])
+    {
+        CollectionCell *cell = (CollectionCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+        CGFloat relativeX = cell.frame.origin.x - self.collectionView.contentOffset.x + cell.cellImage.frame.origin.x;
+        CGFloat relativeY = cell.frame.origin.y - self.collectionView.contentOffset.y + cell.cellImage.frame.origin.y;
+        
+        self.touchPoint = CGPointMake(relativeX, relativeY);
+        _zoomAnimationController.touchPoint = self.touchPoint;
+    }
     self.detailView.cellIndex = indexPath.row;
     [self.navigationController presentViewController:self.detailView animated:YES completion:nil];
 }
@@ -115,5 +128,7 @@ NSString * const REUSE_COLLECTION_CELL_ID = @"CollectionCell";
 {
     return _zoomAnimationController;
 }
+
+
 
 @end
